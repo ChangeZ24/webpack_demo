@@ -6,8 +6,6 @@
 
 默认为：```./src/index.js```
 
-<!--more-->
-
 ```
 module.exports={
     //配置入口
@@ -284,8 +282,6 @@ module.exports = {
 
 当使用commonjs模块生成，修改src/index.js文件引入library
 
-<!--more-->
-
 ```
 import { webpackSay } from '../library'; // 引入 library 的 webpackSay 方法
 
@@ -503,8 +499,6 @@ import noticewebpack from './notice-webpack.vue?inline'; // 导入noticewebpack�
 ### resolve.alias
 
 > 创建```import```或```require```中间```request```的别名
-
-<!--more-->
 
 ```
 //使用alias前

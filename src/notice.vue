@@ -2,7 +2,7 @@
   <div class="notice">
     <div>通知webpack</div>
     <div>通知测试中。。。。。。。</div>
-    <div class="boy">{{ msg }}</div>
+    <div class="msg">{{ msg }}</div>
   </div>
 </template>
 <script>
@@ -17,7 +17,7 @@ export default {
 </script>
 <style lang="scss">
 .notice {
-  .boy {
+  .msg {
     color: #19cfe1;
   }
 }
