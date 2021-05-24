@@ -151,7 +151,7 @@ module.exports = {
   context: path.resolve(__dirname, './src'), // context 上下文指向 src 目录
   entry: () => new Promise((resolve) => resolve('./index.js')), // 利用方法返回一个异步的入口
   output: {
-    path: path.resolve(__dirname, './lib'), // 修改输出路径为 “sy_webpack-config/lib”
+    path: path.resolve(__dirname, './lib'), // 修改输出路径为 “webpack_demo/lib”
     publicPath: './lib/', // 配置公共路径
   },
 };
@@ -303,7 +303,7 @@ module.exports = {
   context: path.resolve(__dirname, './src'), // context 上下文指向 src 目录
   entry: () => new Promise((resolve) => resolve('./index.js')), // 利用方法返回一个异步的入口
   output: {
-    path: path.resolve(__dirname, './lib'), // 修改输出路径为 “sy_webpack-config/lib”
+    path: path.resolve(__dirname, './lib'), // 修改输出路径为 “webpack_demo/lib”
     publicPath: './lib/', // 配置公共路径
     filename: "[name].js", //配置入口最后生成输出文件名称
     chunkFilename: "[name].[chunkhash:8].js" //让它的组成为 `名称.8位内容的hash值.js`
@@ -419,7 +419,7 @@ module.exports = {
 > 用来与发布者的request对应的模块项匹配，其用法与```Rule.test```一致
 
 ```
-//只需要用 vue-loader 加载 sy_webpack-config/src/index.js 下的 notice-webpack.vue 文件
+//只需要用 vue-loader 加载 webpack_demo/src/index.js 下的 notice-webpack.vue 文件
 
 {
 test: /\.vue$/,
