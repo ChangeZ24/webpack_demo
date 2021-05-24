@@ -17,7 +17,18 @@
   },
   "homepage": "https://github.com/ChangeZ24/webpack_demo#readme",
   "devDependencies": {
+    "autoprefixer": "^9.8.6",
+    "css-loader": "^5.2.5",
+    "postcss-loader": "^3.0.0",
+    "sass": "^1.34.0",
+    "sass-loader": "^10.2.0",
+    "style-loader": "^2.0.0",
+    "vue-loader": "^15.9.7",
+    "vue-template-compiler": "^2.6.12",
     "webpack": "^4.44.1",
     "webpack-cli": "^4.7.0"
+  },
+  "dependencies": {
+    "vue": "^2.6.12"
   }
 }

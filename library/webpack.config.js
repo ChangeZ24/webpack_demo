@@ -8,6 +8,6 @@ module.exports = {
     path: path.resolve(__dirname, './lib'),
     library: 'webpackSay',
     libraryExport: 'default',
-    libraryTarget: 'var',
+    libraryTarget: 'commonjs',
   },
 };
