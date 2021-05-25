@@ -4,7 +4,10 @@
   "description": "webpack实战demo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && webpack --mode=production",
+    "dev": "webpack-dev-server --mode=development --progress",
+    "lint": "eslint ./src/* --fix"
   },
   "repository": {
     "type": "git",
@@ -14,9 +17,41 @@
   "license": "ISC",
   "homepage": "https://github.com/ChangeZ24/webpack_demo/webpack-demo#readme",
   "devDependencies": {
-    "webpack": "^5.37.1",
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "@vue/babel-preset-jsx": "^1.1.2",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^7.0.0",
+    "autoprefixer": "^9.8.6",
+    "babel-loader": "^8.1.0",
+    "core-js": "^3.6.5",
+    "css-loader": "^4.3.0",
+    "cssnano": "^4.1.10",
+    "eslint": "^7.27.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-vue": "^7.9.0",
+    "fork-ts-checker-webpack-plugin": "^6.2.10",
+    "html-webpack-plugin": "^4.4.1",
+    "mini-css-extract-plugin": "^0.11.2",
+    "postcss-loader": "^4.0.2",
+    "sass": "^1.26.10",
+    "sass-loader": "^10.0.2",
+    "ts-loader": "^8.0.3",
+    "typescript": "^4.0.2",
+    "vue-loader": "^15.9.3",
+    "webpack": "^4.44.1",
     "webpack-chain": "^6.5.1",
-    "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "vue": "^2.6.12",
+    "vue-class-component": "^7.2.6",
+    "vue-property-decorator": "^9.0.0",
+    "vue-template-compiler": "^2.6.12"
   }
 }
