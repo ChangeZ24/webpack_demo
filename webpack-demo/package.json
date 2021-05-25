@@ -1,0 +1,22 @@
+{
+  "name": "webpack-demo",
+  "version": "1.0.0",
+  "description": "webpack实战demo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChangeZ24/webpack_demo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/ChangeZ24/webpack_demo/webpack-demo#readme",
+  "devDependencies": {
+    "webpack": "^5.37.1",
+    "webpack-chain": "^6.5.1",
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-server": "^3.11.2"
+  }
+}
