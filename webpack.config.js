@@ -1,146 +1,156 @@
-const path = require("path");
+const path = require('path');
+const Config = require('webpack-chain');
+const config = new Config();
 
-module.exports = {
-    mode: 'production', //测试环境
-    context: path.resolve(__dirname, "./src"), //context上下文指向src目录
-    entry: ()=> new Promise((resolve)=>resolve("./index.js")), //利用方法返回一个异步的入口
-    output: {
-        path: path.resolve(__dirname, './lib'), //修改输出路径为“webpack_demo/lib”
-        publicPath: "/lib/", //配置公共路径
-        filename: "[name].js", //配置入口最后生成输出文件名称
-        chunkFilename: "[name].[chunkhash:8].js" //让它的组成为 `名称.8位内容的hash值.js`
+config
+    .mode('production') // 配置 mode
+    .context(path.resolve(__dirname, './src')) // context 上下文指向 src 目录
+    .output.path(path.resolve(__dirname, './lib')) // 修改输出路径为 “sy_webpack-config/lib”
+    .publicPath('/lib/') // 配置公共路径
+    .filename('[name].js') // 配置入口最后生成输出文件名称
+    .chunkFilename('[name].[chunkhash:8].js') // 让它的组成为：名称 +.8 位内容的 hash 值 +.js
+    .end()
+    .module.noParse(/(library)/) // 过滤掉 library 模块
+    .rule('vue') // vue-loader 配置
+    .test(/\.vue$/)
+    .use('vue-loader')
+    .loader('vue-loader')
+    .end()
+    .end()
+    .rule('sass') // sass-loader 配置
+    .test(/\.(sass|scss)$/)
+    .use('style-loader')
+    .loader('style-loader')
+    .end()
+    .use('css-loader')
+    .loader('css-loader')
+    .end()
+    .use('postcss-loader')
+    .loader('postcss-loader')
+    .options({
+    ident: 'postcss',
+    config: {
+        path: path.resolve(__dirname, './postcss.config.js'),
     },
-    module: {
-        noParse: /(library)/, //过滤掉 library 模块
-        rules: [
-            {
-                test: /\.vue$/,
-                use: 'vue-loader'
-            },
-            {
-                test: /\.(sass|scss)$/,
-                use: [
-                    "style-loader",
-                    "css-loader",
-                    {
-                        loader: "postcss-loader",
-                        options: {
-                            ident: "postcss",
-                            config: {
-                                path: path.resolve(__dirname,"./postcss.config.js")
-                            }
-                        }
-                    },
-                    "sass-loader"
-                ]
-            },
-            {
-                test: /\.(sass|scss)$/,
-                loader: path.resolve(__dirname, './loaders/cus-sass-loader.js'),
-                enforce: "pre"
-            }
-        ]
-    },
-    resolve: {
-        alias: {
-            '$NOTICE': path.resolve(__dirname, './src/notice-webpack.vue')
-        },
-        extensions: ['.wasm', '.mjs', '.js', '.json', '.vue'],
-        modules: [path.resolve(__dirname, "src"), "node_modules"]
-    },
-    plugins: [
-        new (require("vue-loader").VueLoaderPlugin)(),
-        { // 引入 webpack-bundle-analyzer 插件
-            apply: compiler => {
-                if(compiler.options.mode === "production"){// 生产环境使用
-                    new (require("webpack-bundle-analyzer").BundleAnalyzerPlugin)({
-                        analyzerHost: "0.0.0.0", // 服务器 host
-                        analyzerPort: "8080"// 服务器端口号
-                    }).apply(compiler);
-                }
-            }
+    })
+    .end()
+    .use('sass-loader') // sass-loader 配置
+    .loader('sass-loader')
+    .end()
+    .end()
+    .rule('cus-sass') // 自定义 sass-loader 配置
+    .test(/\.(sass|scss)$/)
+    .enforce('pre')
+    .use('cus-sass-loader')
+    .loader('cus-sass-loader')
+    .end()
+    .end()
+    .end() // module 配置结束
+    .resolve // 配置 resolve
+    .alias.set('$NOTICE', path.resolve(__dirname, './src/notice-webpack.vue'))
+    .end()
+    .extensions.add('.wasm')
+    .add('.mjs')
+    .add('.js')
+    .add('.json')
+    .add('.vue')
+    .end()
+    .modules.add(path.resolve(__dirname, 'src'))
+    .add('node_modules')
+    .end()
+    .end()
+    .resolveLoader // 配置 resolveLoader
+    .modules.add(path.resolve(__dirname, 'loaders'))
+    .add('node_modules')
+    .end()
+    .end()
+    .plugin('vue-loader-plugin') // 配置 vue-loader-plugin
+    .use(require('vue-loader').VueLoaderPlugin, [])
+    .end()
+    .plugin('webpack-bundle-analyzer') // 配置 webpack-bundle-analyzer
+    .use({
+    apply: (compiler) => {
+        if (compiler.options.mode === 'production') {
+        new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)({
+            analyzerHost: '0.0.0.0',
+            analyzerPort: '8080',
+        }).apply(compiler);
         }
+    },
+    })
+    .end()
+    .devServer.host('0.0.0.0') // 如果你希望服务器外部可访问
+    .disableHostCheck(true) // 关闭白名单校验
+    .before(function (app, devServer, compiler) {
+    const glob = require('glob');
+    const mockPaths = `${path.join(__dirname, './mock')}/*.js`; // 获取所有的 mock 函数
+    glob(mockPaths, function (er, files) {
+        files.forEach((mockFile) => {
+        // 遍历所有的 mock 函数
+        const mockFunc = require(mockFile);
+        const methodName = path.basename(mockFile).split('.')[0];
+        app.all('/' + methodName, mockFunc); // 添加 mock 函数到服务器
+        });
+    });
+    })
+    .contentBase(path.resolve(__dirname, './public')) // 设置一个 express 静态目录
+    .historyApiFallback({
+    disableDotRule: true, // 禁止在链接中使用 "." 符号
+    rewrites: [
+        { from: /^\/$/, to: '/index.html' }, // 将所有的 404 响应重定向到 index.html 页面
     ],
-    devServer: {
-        disableHostCheck: true, //关闭白名单校验
-        before(app, devServer, compiler){
-            const glob = require("glob");
-            const mockPaths = `${path.join(__dirname,'./mock')}/*.js`;//获取所有mock函数
-            glob(mockPaths,function(er,files){
-                files.forEach((mockFile) => {// 遍历所有mock函数
-                    const mockFunc = require(mockFile); // 获取当前mock函数
-                    const methodName = path.basename(mockFile).split(".")[0];//获取当前mock名称
-                    app.all("/" + methodName, mockFunc); // 添加mock函数到服务器
-                });
-            });
+    })
+    .hot(true) // 打开页面热更新功能
+    .sockPort('location') // 设置成平台自己的端口
+    .end() // server 配置结束
+    .devtool('source-map')
+    .externals({
+    vue: 'Vue',
+    })
+    .optimization // 配置 optimization
+    .minimizer('terser-webpack-plugin')
+    .use({
+    apply: (compiler) => {
+        // Lazy load the Terser plugin
+        const TerserPlugin = require('terser-webpack-plugin');
+        const SourceMapDevToolPlugin = require('webpack/lib/SourceMapDevToolPlugin');
+        new TerserPlugin({
+        cache: true,
+        parallel: true,
+        // 是否开启 sourceMap
+        sourceMap:
+            (compiler.options.devtool &&
+            /source-?map/.test(compiler.options.devtool)) ||
+            (compiler.options.plugins &&
+            compiler.options.plugins.some(
+                (p) => p instanceof SourceMapDevToolPlugin
+            )),
+        terserOptions: {
+            compress: {
+            drop_console: true, // 删除 console
+            },
         },
-        contentBase: path.resolve(__dirname, "./public"),
-        historyApiFallback:{
-            disableDotRule: true,// 禁止在链接中使用.
-            rewrites:[
-                { //将所有404响应都重定向到index.html
-                    from: /ˆ\/$/,
-                    to: 'index.html'
-                }
-            ]
-        },
-        hot: true, // 打开页面热更新功能
-        sockPort: 'location', // 设置成平台自己的端口
-        // injectClient: false,
-        // open: {
-        //     app: ["firefox"]
-        // }
+        }).apply(compiler);
     },
-    devtool: "cheap-eval-source-map",
-    externals: {
-        vue: "Vue"
-    },
-    // performance: {
-    //     hints: "error",
-    //     maxAssetSize: 1*1024, // 所有资源文件最大限制
-    //     assetFilter: function assetFilter(assetFilename) {
-    //       return !(/\.map$/.test(assetFilename)); // 忽略掉 source-map 文件
-    //     }
-    // },
-    optimization: {
-        minimize: true, // 开启代码压缩
-        minimizer: [ // 自定义压缩规则
-            {
-                apply: compiler => {
-                    // Lazy load the Terser plugin
-                    const TerserPlugin = require("terser-webpack-plugin");
-                    const SourceMapDevToolPlugin = require("webpack/lib/SourceMapDevToolPlugin");
-                    new TerserPlugin({
-                        cache: true,
-                        parallel: true,
-                        sourceMap: // 是否开启 sourceMap
-                            (compiler.options.devtool && /source-?map/.test(compiler.options.devtool)) ||
-                            (compiler.options.plugins &&
-                                compiler.options.plugins.some(p => p instanceof SourceMapDevToolPlugin)),
-                        terserOptions: {
-                            compress: {
-                                drop_console: true, // 删除 console
-                            }
-                        }
-                    }).apply(compiler);
-                }
-            }
-        ],
-        splitChunks: {
-            chunks: "all", // 设置所有 chunk 都支持分包
-            cacheGroups: {
-                default: false, // 禁止掉默认的 default 分包规则
-                vendors: false, // 禁止掉默认的 vendors 分包规则
-                customer: { // 自定义分包规则
-                    name: "notice-webpack", // 分包后新 chunk 名称
-                    test: (chunk)=>{
-                        return /library/.test(chunk.request) // library 下的模块需要拆分
-                    },
-                    minSize: 0, // 包大小不限制
-                    priority: -20 // 优先级
-                }
-            }
+    })
+    .end()
+    .splitChunks({
+    chunks: 'all', // 设置所有 chunk 都支持分包
+    cacheGroups: {
+        default: false, // 禁止掉默认的 default 分包规则
+        vendors: false, // 禁止掉默认的 vendors 分包规则
+        customer: {
+        // 自定义分包规则
+        name: 'notice-webpack', // 分包后新 chunk 名称
+        test: (chunk) => {
+            return /library/.test(chunk.request); // library 下的模块需要拆分
         },
-        runtimeChunk: "single"
-    }
-};
+        minSize: 0, // 包大小不限制
+        priority: -20, // 优先级
+        },
+    },
+    })
+    .runtimeChunk('single');
+const rawConfig = config.toConfig();
+rawConfig.entry = () => new Promise((resolve) => resolve('./index.js')); // 配置入口
+module.exports = rawConfig;
