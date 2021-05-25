@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-    mode: 'development', //测试环境
+    mode: 'production', //测试环境
     context: path.resolve(__dirname, "./src"), //context上下文指向src目录
     entry: ()=> new Promise((resolve)=>resolve("./index.js")), //利用方法返回一个异步的入口
     output: {
@@ -49,7 +49,17 @@ module.exports = {
         modules: [path.resolve(__dirname, "src"), "node_modules"]
     },
     plugins: [
-        new (require("vue-loader").VueLoaderPlugin)()
+        new (require("vue-loader").VueLoaderPlugin)(),
+        { // 引入 webpack-bundle-analyzer 插件
+            apply: compiler => {
+                if(compiler.options.mode === "production"){// 生产环境使用
+                    new (require("webpack-bundle-analyzer").BundleAnalyzerPlugin)({
+                        analyzerHost: "0.0.0.0", // 服务器 host
+                        analyzerPort: "8080"// 服务器端口号
+                    }).apply(compiler);
+                }
+            }
+        }
     ],
     devServer: {
         disableHostCheck: true, //关闭白名单校验
@@ -92,4 +102,45 @@ module.exports = {
     //       return !(/\.map$/.test(assetFilename)); // 忽略掉 source-map 文件
     //     }
     // },
+    optimization: {
+        minimize: true, // 开启代码压缩
+        minimizer: [ // 自定义压缩规则
+            {
+                apply: compiler => {
+                    // Lazy load the Terser plugin
+                    const TerserPlugin = require("terser-webpack-plugin");
+                    const SourceMapDevToolPlugin = require("webpack/lib/SourceMapDevToolPlugin");
+                    new TerserPlugin({
+                        cache: true,
+                        parallel: true,
+                        sourceMap: // 是否开启 sourceMap
+                            (compiler.options.devtool && /source-?map/.test(compiler.options.devtool)) ||
+                            (compiler.options.plugins &&
+                                compiler.options.plugins.some(p => p instanceof SourceMapDevToolPlugin)),
+                        terserOptions: {
+                            compress: {
+                                drop_console: true, // 删除 console
+                            }
+                        }
+                    }).apply(compiler);
+                }
+            }
+        ],
+        splitChunks: {
+            chunks: "all", // 设置所有 chunk 都支持分包
+            cacheGroups: {
+                default: false, // 禁止掉默认的 default 分包规则
+                vendors: false, // 禁止掉默认的 vendors 分包规则
+                customer: { // 自定义分包规则
+                    name: "notice-webpack", // 分包后新 chunk 名称
+                    test: (chunk)=>{
+                        return /library/.test(chunk.request) // library 下的模块需要拆分
+                    },
+                    minSize: 0, // 包大小不限制
+                    priority: -20 // 优先级
+                }
+            }
+        },
+        runtimeChunk: "single"
+    }
 };
