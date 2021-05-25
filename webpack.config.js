@@ -6,7 +6,7 @@ module.exports = {
     entry: ()=> new Promise((resolve)=>resolve("./index.js")), //利用方法返回一个异步的入口
     output: {
         path: path.resolve(__dirname, './lib'), //修改输出路径为“webpack_demo/lib”
-        publicPath: "./lib/", //配置公共路径
+        publicPath: "/lib", //配置公共路径
         filename: "[name].js", //配置入口最后生成输出文件名称
         chunkFilename: "[name].[chunkhash:8].js" //让它的组成为 `名称.8位内容的hash值.js`
     },
@@ -50,5 +50,35 @@ module.exports = {
     },
     plugins: [
         new (require("vue-loader").VueLoaderPlugin)()
-    ]
+    ],
+    devServer: {
+        disableHostCheck: true, //关闭白名单校验
+        before(app, devServer, compiler){
+            const glob = require("glob");
+            const mockPaths = `${path.join(__dirname,'./mock')}/*.js`;//获取所有mock函数
+            glob(mockPaths,function(er,files){
+                files.forEach((mockFile) => {// 遍历所有mock函数
+                    const mockFunc = require(mockFile); // 获取当前mock函数
+                    const methodName = path.basename(mockFile).split(".")[0];//获取当前mock名称
+                    app.all("/" + methodName, mockFunc); // 添加mock函数到服务器
+                });
+            });
+        },
+        contentBase: path.resolve(__dirname, "./public"),
+        historyApiFallback:{
+            disableDotRule: true,// 禁止在链接中使用.
+            rewrites:[
+                { //将所有404响应都重定向到index.html
+                    from: /ˆ\/$/,
+                    to: 'index.html'
+                }
+            ]
+        },
+        hot: true, // 打开页面热更新功能
+        sockPort: 'location', // 设置成平台自己的端口
+        // injectClient: false,
+        // open: {
+        //     app: ["firefox"]
+        // }
+    },
 };
