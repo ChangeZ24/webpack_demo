@@ -6,7 +6,7 @@ module.exports = {
     entry: ()=> new Promise((resolve)=>resolve("./index.js")), //利用方法返回一个异步的入口
     output: {
         path: path.resolve(__dirname, './lib'), //修改输出路径为“webpack_demo/lib”
-        publicPath: "/lib", //配置公共路径
+        publicPath: "/lib/", //配置公共路径
         filename: "[name].js", //配置入口最后生成输出文件名称
         chunkFilename: "[name].[chunkhash:8].js" //让它的组成为 `名称.8位内容的hash值.js`
     },
@@ -81,4 +81,15 @@ module.exports = {
         //     app: ["firefox"]
         // }
     },
+    devtool: "cheap-eval-source-map",
+    externals: {
+        vue: "Vue"
+    },
+    // performance: {
+    //     hints: "error",
+    //     maxAssetSize: 1*1024, // 所有资源文件最大限制
+    //     assetFilter: function assetFilter(assetFilename) {
+    //       return !(/\.map$/.test(assetFilename)); // 忽略掉 source-map 文件
+    //     }
+    // },
 };

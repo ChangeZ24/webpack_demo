@@ -1,5 +1,5 @@
 import {webpackSay} from "../library"; //引入 library 的 webpackSay 方法
-import Vue from "vue"; //导入vue
+// import Vue from "vue"; //导入vue
 import noticeWebpack from "$NOTICE"; //导入noticeWebpack组件
 
 document.write("hello webpack!");
